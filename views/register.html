@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario | RFID Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.25);
+        }
+        
+        .password-strength {
+            height: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .error-message {
+            opacity: 0;
+            max-height: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .error-message.show {
+            opacity: 1;
+            max-height: 2rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <button onclick="window.history.back()" style="position: fixed; top: 20px; left: 20px; display: inline-flex; align-items: center; padding: 12px 24px; background-color: #a3c8f1; color: #fff; font-size: 16px; border: none; border-radius: 25px; cursor: pointer; transition: background-color 0.3s, transform 0.3s; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000;"><i class="fas fa-arrow-left" style="margin-right: 10px; font-size: 18px;"></i>Regresar</button>
+    <div class="glass-card w-full max-w-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 py-8 px-10 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="bg-white p-3 rounded-full shadow-lg">
+                    <i class="fas fa-user-plus text-3xl gradient-text"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-white">Registro de Usuario</h1>
+            <p class="text-indigo-100 mt-2">Crea tu cuenta para el sistema RFID</p>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="px-8 py-8">
+            <form id="registerForm" class="space-y-5">
+                
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-at text-indigo-500"></i>
+                        </div>
+                        <input id="username" name="username" type="username" required 
+                            class="input-field pl-10 pr-4 py-3 w-full rounded-lg focus:outline-none"
+                            placeholder="MiUsername">
+                    </div>
+                </div>
+                
+                <!-- Contraseña -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-indigo-500"></i>
+                        </div>
+                        <input id="password" name="password" type="password" required 
+                            class="input-field pl-10 pr-4 py-3 w-full rounded-lg focus:outline-none"
+                            placeholder="••••••••" minlength="8">
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                            <i class="fas fa-eye-slash text-gray-400 hover:text-indigo-600"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2 grid grid-cols-4 gap-1">
+                        <div id="strength1" class="password-strength bg-gray-200 rounded"></div>
+                        <div id="strength2" class="password-strength bg-gray-200 rounded"></div>
+                        <div id="strength3" class="password-strength bg-gray-200 rounded"></div>
+                        <div id="strength4" class="password-strength bg-gray-200 rounded"></div>
+                    </div>
+                    <div id="passwordError" class="error-message text-red-600 text-xs mt-1"></div>
+                </div>
+                
+                <!-- Confirmar Contraseña -->
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-indigo-500"></i>
+                        </div>
+                        <input id="confirmPassword" name="confirmPassword" type="password" required 
+                            class="input-field pl-10 pr-4 py-3 w-full rounded-lg focus:outline-none"
+                            placeholder="••••••••">
+                    </div>
+                    <div id="confirmError" class="error-message text-red-600 text-xs mt-1"></div>
+                </div>
+
+                <div>
+                    <label for="Role" class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-person text-indigo-500"></i>
+                        </div>
+                        <input id="role" name="role" type="role" required 
+                            class="input-field pl-10 pr-4 py-3 w-full rounded-lg focus:outline-none"
+                            placeholder="Administrator">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="Role" class="block text-sm font-medium text-gray-700 mb-1">Card Id</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-code-branch text-indigo-500"></i>
+                        </div>
+                        <input id="card_id" name="role" type="role" required 
+                            class="input-field pl-10 pr-4 py-3 w-full rounded-lg focus:outline-none"
+                            placeholder="Base64 Encoded 4 byte ID">
+                    </div>
+                </div>
+
+                <!-- Términos y Condiciones -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="terms" name="terms" type="checkbox" required 
+                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="terms" class="font-medium text-gray-700">Acepto los <a href="./terms.html" class="text-indigo-600 hover:text-indigo-500">Términos y Condiciones</a></label>
+                    </div>
+                </div>
+                
+                <!-- Botón de Registro -->
+                <div>
+                    <button type="submit" 
+                        class="btn-primary w-full flex justify-center py-3 px-4 rounded-lg text-white font-medium shadow-md">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Registrar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.9.0/dist/sweetalert2.all.min.js"></script>
+    <script>
+        // Mostrar/ocultar contraseña
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        });
+        
+        // Validación de contraseña
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBars = [
+                document.getElementById('strength1'),
+                document.getElementById('strength2'),
+                document.getElementById('strength3'),
+                document.getElementById('strength4')
+            ];
+            
+            // Reset
+            strengthBars.forEach(bar => {
+                bar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+                bar.classList.add('bg-gray-200');
+            });
+            
+            if (password.length === 0) return;
+            
+            // Calcular fortaleza
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^A-Za-z0-9]/)) strength++;
+            
+            // Actualizar barras
+            for (let i = 0; i < strength; i++) {
+                strengthBars[i].classList.remove('bg-gray-200');
+                if (strength <= 2) {
+                    strengthBars[i].classList.add('bg-red-500');
+                } else if (strength === 3) {
+                    strengthBars[i].classList.add('bg-yellow-500');
+                } else {
+                    strengthBars[i].classList.add('bg-green-500');
+                }
+            }
+            
+            // Validación
+            const errorElement = document.getElementById('passwordError');
+            if (password.length < 8) {
+                errorElement.textContent = 'La contraseña debe tener al menos 8 caracteres';
+                errorElement.classList.add('show');
+            } else {
+                errorElement.classList.remove('show');
+            }
+        });
+        
+        // Validar confirmación de contraseña
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            const errorElement = document.getElementById('confirmError');
+            
+            if (confirmPassword !== password) {
+                errorElement.textContent = 'Las contraseñas no coinciden';
+                errorElement.classList.add('show');
+            } else {
+                errorElement.classList.remove('show');
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password.length < 8) {
+                document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 8 caracteres';
+                document.getElementById('passwordError').classList.add('show');
+                isValid = false;
+            }
+            
+            if (password !== confirmPassword) {
+                document.getElementById('confirmError').textContent = 'Las contraseñas no coinciden';
+                document.getElementById('confirmError').classList.add('show');
+                isValid = false;
+            }
+            
+            if (!document.getElementById('terms').checked) {
+                alert('Debes aceptar los términos y condiciones');
+            }
+            if (isValid) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/register/user",
+                    data: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                        role: document.getElementById('role').value,
+                        card_id: document.getElementById('card_id').value
+                    }),
+                    contentType: 'application/json',
+                    success: function(datos){
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-right',
+                            icon: 'success',
+                            title: 'Usuario registrado exitosamente...',
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                        $("form")[0].reset();
+                    },
+                    error: function(error) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-right',
+                            icon: 'error',
+                            title: error.responseJSON.message,
+                            showConfirmButton: false,
+                            timer: 4000
+                        })
+                    }
+                })
+            }
+         });
+    </script>
+</body>
+</html>

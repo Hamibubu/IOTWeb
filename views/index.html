@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Access Analytics | Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style type="text/scss">
+        @import 'tailwindcss/base';
+        @import 'tailwindcss/components';
+        @import 'tailwindcss/utilities';
+
+        $primary: #5b37eb;
+        $secondary: #00c6fb;
+        $danger: #ff4d7d;
+        $success: #2fd8a0;
+        $warning: #ffb74d;
+        $dark: #1e293b;
+        $light: #f8fafc;
+
+        :root {
+            --primary: #{$primary};
+            --secondary: #{$secondary};
+            --danger: #{$danger};
+            --success: #{$success};
+            --warning: #{$warning};
+            --dark: #{$dark};
+            --light: #{$light};
+        }
+
+        body {
+            @apply bg-gray-50 text-slate-800;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+
+            @media (max-width: 1024px) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sidebar {
+            @apply bg-indigo-900 text-white p-6;
+            background: linear-gradient(135deg, $primary, darken($secondary, 15%));
+            
+            .logo {
+                @apply text-2xl font-bold mb-8 flex items-center;
+                
+                span {
+                    @apply text-amber-300;
+                }
+            }
+
+            .nav-item {
+                @apply flex items-center px-4 py-3 rounded-lg mb-2 transition-all duration-300;
+
+                &:hover, &.active {
+                    @apply bg-white bg-opacity-20;
+                }
+
+                i {
+                    @apply mr-3 text-lg;
+                }
+            }
+        }
+
+        .stat-card {
+            @apply bg-white rounded-xl shadow-sm p-6 transition-all duration-300 hover:shadow-md;
+
+            &:hover {
+                transform: translateY(-3px);
+            }
+
+            .value {
+                @apply text-3xl font-bold mt-2 mb-1;
+            }
+
+            .trend {
+                @apply flex items-center text-sm;
+
+                &.up {
+                    @apply text-emerald-500;
+                }
+
+                &.down {
+                    @apply text-rose-500;
+                }
+            }
+        }
+
+        .chart-container {
+            @apply bg-white rounded-xl shadow-sm p-6;
+            height: 350px;
+
+            .chart-title {
+                @apply text-lg font-semibold mb-4 flex items-center;
+
+                i {
+                    @apply mr-2;
+                }
+            }
+        }
+
+        .access-log {
+            @apply bg-white rounded-xl shadow-sm p-6;
+
+            .log-item {
+                @apply py-3 border-b border-gray-100 last:border-0 flex items-center;
+
+                &.denied {
+                    @apply bg-rose-50;
+                }
+
+                .status-badge {
+                    @apply rounded-full w-3 h-3 mr-3;
+
+                    &.granted {
+                        @apply bg-emerald-500;
+                    }
+
+                    &.denied {
+                        @apply bg-rose-500;
+                    }
+                }
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(91, 55, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(91, 55, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(91, 55, 235, 0);
+            }
+        }
+    </style>
+</head>
+<script>
+    function clearCookie() {
+        fetch('/clear-cookies', { method: 'GET' })
+            .then(response => response.text())
+            .then(message => {
+                location.href="./login.html"
+            })
+            .catch(error => console.error('Error al borrar cookie:', error));
+    }
+    fetch('/welcome', { method: 'GET' })
+            .then(response => response.text())
+            .then(message => {
+                if (message !== "0"){
+                    const container = document.getElementById('dynamicLinkContainer');
+                    container.innerHTML = message;
+                }
+            })
+            .catch(error => console.error('Error al borrar cookie:', error));
+</script>
+<body>
+    <div class="dashboard-grid">
+        <div class="horizontal-sidebar w-full bg-gradient-to-r from-indigo-900 to-purple-900 px-6 py-4 flex items-center justify-between shadow-xl">
+            <!-- Logo a la izquierda -->
+            <div class="logo-group flex items-center">
+                <div class="logo flex items-center bg-white bg-opacity-10 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-white border-opacity-20 hover:scale-105 transition-transform">
+                    <div class="icon-container bg-indigo-500 p-2 rounded-lg shadow-inner mr-3">
+                        <i class="fas fa-id-card-alt text-white text-lg"></i>
+                    </div>
+                    <div class="text-container">
+                        <h1 class="text-xl font-bold text-white leading-tight">
+                            <span class="text-indigo-300">RFID</span> 
+                            <span class="text-indigo-200 text-sm font-normal ml-1">Analytics Pro v3.2.1</span>
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Menú central -->
+            <nav class="hidden md:flex items-center space-x-1 mx-4">
+                <a href="#" class="menu-item px-4 py-2 rounded-lg text-white text-opacity-90 hover:text-opacity-100 hover:bg-white hover:bg-opacity-10 transition-all flex items-center">
+                    <i class="fas fa-tachometer-alt mr-2 text-indigo-300"></i>
+                    Dashboard
+                </a>
+                <div id="dynamicLinkContainer"></div>
+                <a class="menu-item px-4 py-2 rounded-lg text-white text-opacity-90 hover:text-opacity-100 hover:bg-white hover:bg-opacity-10 transition-all flex items-center" onclick="clearCookie()">
+                    <i class="fas fa-power-off mr-2 text-amber-300"></i>
+                    Cerrar Sesión
+                </a>
+            </nav>
+        
+            <!-- Indicador de estado a la derecha -->
+            <div class="connection-status flex items-center bg-white bg-opacity-5 px-4 py-2 rounded-full border border-white border-opacity-10 hover:bg-opacity-10 transition-all">
+                <!-- Punto parpadeante en verde -->
+                <div class="relative h-3 w-3 mr-2">
+                    <div class="absolute inset-0 bg-green-400 rounded-full opacity-75 animate-ping"></div>
+                    <div class="absolute inset-0 bg-green-500 rounded-full"></div>
+                </div>
+                <span class="text-sm text-white text-opacity-90 mr-2">Sistema activo</span>
+                <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+            </div>
+        </div>
+        
+        <style>
+            /* Animaciones personalizadas */
+            .animate-ping {
+                animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+            }
+            
+            @keyframes ping {
+                75%, 100% {
+                    transform: scale(1.3);
+                    opacity: 0;
+                }
+            }
+            
+            .animate-pulse {
+                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.7;
+                }
+            }
+            
+            /* Efecto hover para el logo */
+            .logo .icon-container {
+                transition: all 0.3s ease;
+            }
+            
+            .logo:hover .icon-container {
+                transform: rotate(-8deg) scale(1.1);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            }
+            
+            /* Efecto para items de menú */
+            .menu-item:hover i {
+                transform: translateX(2px);
+                transition: transform 0.2s ease;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .horizontal-sidebar {
+                    flex-direction: column;
+                    padding: 1rem;
+                }
+                
+                .logo-group {
+                    margin-bottom: 1rem;
+                }
+                
+                nav {
+                    margin: 1rem 0;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+                
+                .menu-item {
+                    margin: 0.25rem;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.9rem;
+                }
+                
+                .connection-status {
+                    margin-top: 1rem;
+                }
+            }
+        </style>
+        <!-- Main Content -->
+        <main class="p-8">
+            <header class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">Dashboard de Accesos</h1>
+                <div class="flex items-center">
+                    <span class="text-sm text-slate-500 mr-4"></span>
+                    <button class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium" onclick="location.reload()">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Actualizar
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="text-slate-500 font-medium">Accesos Hoy</div>
+                    <div class="value text-indigo-600" id="today">1,428</div>
+                    <div class="trend up">
+                        <i class="fas fa-star mr-1"></i>
+                        Logins exitosos
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-slate-500 font-medium">Intentos Fallidos</div>
+                    <div class="value text-rose-600" id="failed_logs">87</div>
+                    <div class="trend down">
+                        <i class="fas fa-biohazard mr-1"></i>
+                        Protegido
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-slate-500 font-medium">Tarjetas Activas</div>
+                    <div class="value text-emerald-600" id="users">24</div>
+                    <div class="trend up">
+                        <i class="fas fa-person-walking mr-1"></i>
+                        Usuarios
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="text-slate-500 font-medium">Protegido</div>
+                    <div class="value text-amber-600">RFID + AI</div>
+                    <div class="trend down">
+                        <i class="fas fa-robot mr-1"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="chart-container lg:col-span-2">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line text-indigo-500"></i>
+                        Accesos por Hora (Últimas 24h)
+                    </div>
+                    <div id="accessChart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-pie-chart text-amber-500"></i>
+                        Usuarios
+                    </div>
+                    <div id="accessTypeChart"></div>
+                </div>
+            </div>
+            
+            <!-- Second Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-calendar-alt text-emerald-500"></i>
+                        Accesos por Día (Última Semana)
+                    </div>
+                    <div id="weeklyChart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-door-closed text-rose-500"></i>
+                        Intentos Fallidos por Razón
+                    </div>
+                    <div id="failedReasonsChart"></div>
+                </div>
+                
+                <div class="access-log">
+                    <div class="chart-title">
+                        <i class="fas fa-list-ul text-slate-500"></i>
+                        Últimos Accesos
+                    </div>
+                    <div class="mt-4">
+                        <div class="log-item">
+                            <div class="status-badge granted"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">Puerta Principal</div>
+                                <div class="text-sm text-slate-500">ID: 284729 • 10:42:15</div>
+                            </div>
+                            <div class="text-sm text-emerald-500 font-medium">PERMITIDO</div>
+                        </div>
+                        <div class="log-item denied">
+                            <div class="status-badge denied"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">Almacén</div>
+                                <div class="text-sm text-slate-500">ID: 284730 • 10:43:22</div>
+                            </div>
+                            <div class="text-sm text-rose-500 font-medium">DENEGADO</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="status-badge granted"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">Oficina</div>
+                                <div class="text-sm text-slate-500">ID: 284731 • 10:45:01</div>
+                            </div>
+                            <div class="text-sm text-emerald-500 font-medium">PERMITIDO</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="status-badge granted"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">Sala de Servidores</div>
+                                <div class="text-sm text-slate-500">ID: 284732 • 10:47:33</div>
+                            </div>
+                            <div class="text-sm text-emerald-500 font-medium">PERMITIDO</div>
+                        </div>
+                        <div class="log-item denied">
+                            <div class="status-badge denied"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">Puerta Principal</div>
+                                <div class="text-sm text-slate-500">ID: 284733 • 10:49:18</div>
+                            </div>
+                            <div class="text-sm text-rose-500 font-medium">DENEGADO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ApexCharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.9.0/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            function escapeHtml(str) {
+                return str.replace(/[&<>"']/g, function(match) {
+                    const escapeMap = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    };
+                    return escapeMap[match];
+                });
+            }
+            // Selector del contenedor principal
+            const logContainer = document.querySelector('.access-log .mt-4');
+            if (!logContainer) return;
+
+            /**
+             * Renderiza los items del log de acceso
+             * @param {Array} accessData - Datos de acceso (top 5 ordenados desde backend)
+             */
+            function renderAccessLog(accessData) {
+                // Validación básica
+                if (!Array.isArray(accessData)) {
+                    console.error('Datos de acceso no válidos');
+                    return;
+                }
+
+                // Limpiar contenedor
+                logContainer.innerHTML = '';
+
+                // Función para formatear hora
+                const formatTime = (timestamp) => {
+                    const date = new Date(Number(timestamp) * 1000);
+                    return date.toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                };
+
+                // Generar items del log
+                accessData.forEach(item => {
+                    const logItem = document.createElement('div');
+                    logItem.className = `log-item ${item.Status === 'Denied' ? 'denied' : ''}`;
+
+                    logItem.innerHTML = `
+                        <div class="status-badge ${item.Status === 'Denied' ? 'denied' : 'granted'}"></div>
+                        <div class="flex-1">
+                            <div class="font-medium">${item.User ? escapeHtml(item.User) : 'Usuario'}</div>
+                            <div class="text-sm text-slate-500">ID: ${item.Card_ID ? escapeHtml(item.Card_ID) : ''} • ${formatTime(item.Timestamp)}</div>
+                        </div>
+                        <div class="text-sm ${item.Status === 'Denied' ? 'text-rose-500' : 'text-emerald-500'} font-medium">
+                            ${item.Status === 'Denied' ? 'DENEGADO' : 'PERMITIDO'}
+                        </div>
+                    `;
+
+                    logContainer.appendChild(logItem);
+                });
+            }
+            function fetchChartData() {
+                return $.ajax({
+                    url: '/api/data/graph',
+                    method: 'GET',
+                    dataType: 'json'
+                });
+            }
+            function initCharts(data) {
+                document.getElementById("users").textContent = data[5].Users;
+                document.getElementById("failed_logs").textContent = data[5].Succesful;
+                document.getElementById("today").textContent = data[5].Failed;
+                renderAccessLog(data[4]);
+                const accessChart = new ApexCharts(document.querySelector("#accessChart"), {
+                    series: [{
+                        name: "Accesos",
+                        data: data[0].Allowed
+                    }, {
+                        name: "Fallidos",
+                        data: data[0].Denied
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: '100%',
+                        toolbar: { show: false },
+                        animations: {
+                            enabled: true,
+                            easing: 'easeout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            },
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
+                        }
+                    },
+                    colors: ['#5b37eb', '#ff4d7d'],
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 2 },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.3,
+                            stops: [0, 90, 100]
+                        }
+                    },
+                    xaxis: {
+                        categories: Array.from({length: 24}, (_, i) => `${i}:00`),
+                        labels: { style: { colors: '#64748b' } }
+                    },
+                    yaxis: { labels: { style: { colors: '#64748b' } } },
+                    tooltip: { theme: 'light' },
+                    legend: { position: 'top', horizontalAlign: 'right' }
+                });
+                accessChart.render();
+                
+                // Tipos de Acceso
+                const accessTypeChart = new ApexCharts(document.querySelector("#accessTypeChart"), {
+                    series: Object.values(data[1]),
+                    chart: {
+                        type: 'donut',
+                        height: '100%',
+                        animations: {
+                            enabled: true,
+                            easing: 'easeout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            }
+                        }
+                    },
+                    colors: ['#5b37eb', '#2fd8a0', '#ffb74d'],
+                    labels: Object.keys(data[1]),
+                    dataLabels: { enabled: false },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '70%',
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        show: true,
+                                        label: 'Total Accesos',
+                                        color: '#64748b'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    legend: { position: 'bottom' },
+                    tooltip: { theme: 'light' }
+                });
+                accessTypeChart.render();
+                
+                // Accesos Semanales
+                const weeklyChart = new ApexCharts(document.querySelector("#weeklyChart"), {
+                    series: [{
+                        name: "Accesos",
+                        data: data[2]
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: '100%',
+                        toolbar: { show: false },
+                        animations: {
+                            enabled: true,
+                            easing: 'easeout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            }
+                        }
+                    },
+                    colors: ['#5b37eb'],
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 6,
+                            columnWidth: '60%',
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    xaxis: {
+                        categories: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                        labels: { style: { colors: '#64748b' } }
+                    },
+                    yaxis: { labels: { style: { colors: '#64748b' } } },
+                    tooltip: { theme: 'light' }
+                });
+                weeklyChart.render();
+                
+                // Razones de Fallo
+                const failedReasonsChart = new ApexCharts(document.querySelector("#failedReasonsChart"), {
+                    series: Object.values(data[3]),
+                    chart: {
+                        type: 'donut',
+                        height: '100%',
+                        animations: {
+                            enabled: true,
+                            easing: 'easeout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            }
+                        }
+                    },
+                    colors: ['#ff0000', '#2fd8a0', '#ffb74d'],
+                    labels: Object.keys(data[3]),
+                    dataLabels: { enabled: false },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '70%',
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        show: true,
+                                        label: 'Accesos Fallidos',
+                                        color: '#64748b'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    legend: { position: 'bottom' },
+                    tooltip: { theme: 'light' }
+                });
+                failedReasonsChart.render();
+            }
+            /*
+            // Mostrar loader mientras se cargan los datos
+            $('.chart-container').html('<div class="loader">Cargando datos...</div>');
+            */
+            // Obtener datos y luego inicializar gráficos
+            fetchChartData()
+                .done(function(data) {
+                    initCharts(data);
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error al cargar los datos:", textStatus, errorThrown);
+                    $('.chart-container').html('<div class="error">Error al cargar los datos. Intente nuevamente.</div>');
+                });
+        });
+    </script>
+</body>
+</html>

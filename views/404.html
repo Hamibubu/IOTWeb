@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página no encontrada | RFID Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(0, 0, 0, 0.2);
+            height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.25);
+        }
+        
+        .rfid-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="glass-card max-w-2xl w-full overflow-hidden text-center">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 py-8 px-10">
+            <div class="flex justify-center mb-4">
+                <div class="bg-white p-3 rounded-full shadow-lg">
+                    <i class="fas fa-id-card-alt text-3xl gradient-text"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-white">RFID Access</h1>
+        </div>
+        
+        <!-- Contenido 404 -->
+        <div class="px-10 py-12">
+            <div class="flex justify-center mb-8">
+                <div class="relative">
+                    <div class="text-9xl font-bold text-gray-300">4</div>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div class="rfid-icon text-5xl text-indigo-600">
+                            <i class="fas fa-id-card-alt"></i>
+                        </div>
+                    </div>
+                    <div class="text-9xl font-bold text-gray-300">4</div>
+                </div>
+            </div>
+            
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">¡Página no encontrada!</h2>
+            <p class="text-gray-600 mb-8">Lo sentimos, la página que estás buscando no existe o ha sido movida.</p>
+            
+            <div class="space-y-4 max-w-xs mx-auto">
+                <a href="index.html" class="btn-primary w-full flex justify-center py-3 px-4 rounded-lg text-white font-medium shadow-md pulse">
+                    <i class="fas fa-home mr-2"></i>
+                    Volver al Inicio
+                </a>
+                
+                <a href="contacto.html" class="inline-block text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-envelope mr-1"></i>
+                    Contactar al soporte
+                </a>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 px-10 py-4 border-t border-gray-200 text-center">
+            <p class="text-xs text-gray-500">
+                © 2023 RFID Access Pro. Todos los derechos reservados.
+                <a href="#" class="text-indigo-600 hover:text-indigo-500">Términos</a> | 
+                <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacidad</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Efecto de escritura para el mensaje
+        const messages = [
+            "¿Perdido en el sistema?",
+            "Acceso denegado a esta ruta",
+            "Tarjeta RFID no reconocida",
+            "Error en la matriz digital"
+        ];
+        
+        const subtitle = document.createElement('p');
+        subtitle.className = 'text-gray-500 text-sm italic mb-6';
+        document.querySelector('h2').insertAdjacentElement('afterend', subtitle);
+        
+        let currentMessage = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100;
+        
+        function typeWriter() {
+            const fullText = messages[currentMessage];
+            
+            if (isDeleting) {
+                subtitle.textContent = fullText.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 50;
+            } else {
+                subtitle.textContent = fullText.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 100;
+            }
+            
+            if (!isDeleting && charIndex === fullText.length) {
+                isDeleting = true;
+                typingSpeed = 1500; // Pausa al final
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                currentMessage = (currentMessage + 1) % messages.length;
+                typingSpeed = 500; // Pausa al inicio
+            }
+            
+            setTimeout(typeWriter, typingSpeed);
+        }
+        
+        // Iniciar el efecto después de 1 segundo
+        setTimeout(typeWriter, 1000);
+    </script>
+</body>
+</html>

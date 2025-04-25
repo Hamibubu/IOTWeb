@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones | RFID Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            background-image: url('https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .glass-container {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #667eea;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .section-title {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 70%;
+            width: 4px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-700 shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <div class="bg-white p-2 rounded-lg mr-3">
+                            <i class="fas fa-id-card-alt text-xl gradient-text"></i>
+                        </div>
+                        <span class="text-white text-xl font-bold">RFID <span class="font-light">Access</span></span>
+                    </a>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-white nav-link">Inicio</a>
+                    <a href="#" class="text-indigo-100 nav-link font-medium">Términos</a>
+                </nav>
+                <button class="md:hidden text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-12 max-w-5xl">
+        <div class="glass-container p-8 md:p-12">
+            <!-- Título -->
+            <div class="text-center mb-12">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Términos y Condiciones de Uso</h1>
+                <p class="text-gray-600">Última actualización: <span class="font-medium">23 de Marzo, 2025</span></p>
+            </div>
+            
+            <!-- Índice -->
+            <div class="bg-indigo-50 rounded-xl p-6 mb-12">
+                <h2 class="text-xl font-semibold text-indigo-800 mb-4">Índice</h2>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <li><a href="#uso" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 1. Uso del Servicio</a></li>
+                    <li><a href="#cuentas" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 2. Cuentas de Usuario</a></li>
+                    <li><a href="#propiedad" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 3. Propiedad Intelectual</a></li>
+                    <li><a href="#responsabilidad" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 4. Limitación de Responsabilidad</a></li>
+                    <li><a href="#terminacion" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 5. Terminación</a></li>
+                    <li><a href="#modificaciones" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 6. Modificaciones</a></li>
+                    <li><a href="#ley" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 7. Ley Aplicable</a></li>
+                    <li><a href="#contacto" class="text-indigo-600 hover:text-indigo-800 flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> 8. Contacto</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contenido de Términos -->
+            <div class="prose max-w-none">
+                <section id="uso" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">1. Uso del Servicio</h2>
+                    <p class="text-gray-700 mb-4">El sistema RFID Access (en adelante, "el Servicio") es una plataforma de control de accesos mediante tecnología de identificación por radiofrecuencia.</p>
+                    <p class="text-gray-700 mb-4">Al utilizar el Servicio, usted acepta cumplir con todos los términos y condiciones establecidos en este documento, así como con todas las leyes y regulaciones aplicables.</p>
+                    <p class="text-gray-700">Queda estrictamente prohibido:</p>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2 mt-2">
+                        <li>Utilizar el Servicio para fines ilegales o no autorizados</li>
+                        <li>Manipular o alterar el funcionamiento normal del sistema</li>
+                        <li>Compartir credenciales de acceso con personas no autorizadas</li>
+                        <li>Intentar acceder a áreas restringidas sin autorización</li>
+                    </ul>
+                </section>
+                
+                <section id="cuentas" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">2. Cuentas de Usuario</h2>
+                    <p class="text-gray-700 mb-4">Para acceder a ciertas funciones del Servicio, deberá crear una cuenta proporcionando información precisa y completa.</p>
+                    <p class="text-gray-700 mb-4">Usted es responsable de:</p>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2 mb-4">
+                        <li>Mantener la confidencialidad de sus credenciales</li>
+                        <li>Toda actividad que ocurra bajo su cuenta</li>
+                        <li>Notificar inmediatamente cualquier uso no autorizado</li>
+                    </ul>
+                    <p class="text-gray-700">Las tarjetas RFID son personales e intransferibles. Cualquier uso no autorizado deberá ser reportado inmediatamente al administrador del sistema.</p>
+                </section>
+                
+                <section id="propiedad" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">3. Propiedad Intelectual</h2>
+                    <p class="text-gray-700 mb-4">El Servicio y su contenido original, características y funcionalidad son propiedad exclusiva de RFID Access y están protegidos por leyes internacionales de derechos de autor, marcas registradas, patentes y otras leyes de propiedad intelectual.</p>
+                    <p class="text-gray-700">Queda prohibida la reproducción, distribución, modificación o creación de obras derivadas sin autorización expresa por escrito.</p>
+                </section>
+                
+                <section id="responsabilidad" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">4. Limitación de Responsabilidad</h2>
+                    <p class="text-gray-700 mb-4">En ningún caso RFID Access será responsable por daños directos, indirectos, incidentales, especiales, consecuentes o punitivos que resulten del uso o incapacidad de usar el Servicio.</p>
+                    <p class="text-gray-700">El Servicio se proporciona "tal cual" y "según disponibilidad", sin garantías de ningún tipo, ya sean expresas o implícitas.</p>
+                </section>
+                
+                <section id="terminacion" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">5. Terminación</h2>
+                    <p class="text-gray-700 mb-4">Podemos terminar o suspender su acceso al Servicio inmediatamente, sin previo aviso ni responsabilidad, si incumple estos Términos.</p>
+                    <p class="text-gray-700">Al terminar, su derecho a utilizar el Servicio cesará inmediatamente. Todas las disposiciones de estos Términos que por su naturaleza deban sobrevivir, sobrevivirán a la terminación.</p>
+                </section>
+                
+                <section id="modificaciones" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">6. Modificaciones</h2>
+                    <p class="text-gray-700 mb-4">Nos reservamos el derecho, a nuestra sola discreción, de modificar o reemplazar estos Términos en cualquier momento.</p>
+                    <p class="text-gray-700">Le notificaremos sobre cambios importantes mediante un aviso visible en nuestro Servicio o por otros medios de comunicación. El uso continuado del Servicio después de dichas modificaciones constituye su aceptación de los nuevos Términos.</p>
+                </section>
+                
+                <section id="ley" class="mb-12">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">7. Ley Aplicable</h2>
+                    <p class="text-gray-700 mb-4">Estos Términos se regirán e interpretarán de acuerdo con las leyes del país donde opera la empresa, sin tener en cuenta sus disposiciones sobre conflictos de leyes.</p>
+                    <p class="text-gray-700">Cualquier disputa relacionada con estos Términos estará sujeta a la jurisdicción exclusiva de los tribunales de dicho país.</p>
+                </section>
+                
+                <section id="contacto">
+                    <h2 class="section-title text-2xl font-bold text-gray-800 mb-6">8. Contacto</h2>
+                    <p class="text-gray-700 mb-4">Para cualquier pregunta sobre estos Términos, por favor contáctenos a través de:</p>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                        <li><strong>Email:</strong> legal@rfidaccess.com</li>
+                        <li><strong>Teléfono:</strong> +1 (555) 123-4567</li>
+                        <li><strong>Dirección:</strong> 123 Tech Park, Ciudad Digital</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botón flotante para volver arriba -->
+    <a href="#" class="back-to-top bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-indigo-800 to-purple-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <a href="#" class="flex items-center">
+                        <div class="bg-white p-2 rounded-lg mr-3">
+                            <i class="fas fa-id-card-alt text-xl gradient-text"></i>
+                        </div>
+                        <span class="text-white text-xl font-bold">RFID <span class="font-light">Access</span></span>
+                    </a>
+                    <p class="mt-2 text-indigo-100 text-sm">Sistema de control de accesos con tecnología RFID</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-indigo-700 text-sm text-indigo-200 text-center">
+                <p>&copy; 2025 RFID Access. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Botón para volver arriba
+        const backToTopButton = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('active');
+            } else {
+                backToTopButton.classList.remove('active');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Smooth scrolling para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
