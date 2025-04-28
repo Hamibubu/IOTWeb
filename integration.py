@@ -1,8 +1,5 @@
 from flask import Flask, request, jsonify
-import cv2
-import os
-import tempfile
-import uuid
+import time
 from werkzeug.utils import secure_filename
 from compare import compare_faces
 
@@ -31,8 +28,9 @@ def recognize_face():
         for face in faces_list:
             full_face = f"uploads/{face}"
             result = compare_faces(face2check, full_face)
-            print(result)
-        return jsonify({"error": str(1)}), 200
+            if result["verified"]:
+                return jsonify({"Status": "Allowed", "Timestamp":str(int(time.time()))}), 200
+        return jsonify({"Status": "Denied"}), 200
     
     except Exception as e:
         print(e)
