@@ -82,6 +82,7 @@ class MetadataController {
                 "Timestamp": timestamp,
                 "User": userdata.Username
             }
+            const st = await createLog(log);
             return  res.status(200).send({ message: 'Access Granted' })
         }catch(err){
             console.log(err)
