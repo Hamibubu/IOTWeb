@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, ScanCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
 
@@ -41,17 +42,53 @@ class MetadataController {
         }  
     }
 
-    async storeLog(req, res){
+    async validateFace(req, res){
         try{
+            const filename=req.uploadedFiles.UserPhoto;
+            var userdata = await getFilesByUser(req.body.User);
+            userdata = userdata[0];
+            const frontphoto = userdata.frontPhoto;
+            const leftphoto = userdata.leftPhoto;
+            const rightphoto = userdata.rightPhoto;
             if (req.headers["x-api-key"] !== "DejameEntrarPorfavorsitoPorfavorTeLoRuego"){
                 return res.status(401).send({ message: 'No intentes entrar si no conoces como!' });
             }
-            var st = await createLog(req.body);
-            return  res.status(200).send({ message: 'Datos guardados de forma exitosa' })   
+            const flask_server=process.env.FLASK_SERVER + "/recognize";
+            const data = {
+                User: req.body.User,
+                File2Check: filename,
+                frontPhoto: frontphoto,
+                leftPhoto: leftphoto,
+                rightPhoto: rightphoto
+            };
+            const resp = await axios.post(flask_server, data)
+            const status_face = resp.data.Status;
+            const timestamp = resp.data.Timestamp;
+            if (status_face === "Denied"){
+                const log = {
+                    "Card_ID": userdata.Card_ID,
+                    "Reason": "Invalid Face",
+                    "Status": "Denied",
+                    "Timestamp": timestamp,
+                    "User": userdata.Username
+                }
+                const st = await createLog(log);
+                return  res.status(200).send({ message: 'Access Denied' })
+            }
+            const log = {
+                "Card_ID": userdata.Card_ID,
+                "Reason": "N/A",
+                "Status": "Allowed",
+                "Timestamp": timestamp,
+                "User": userdata.Username
+            }
+            return  res.status(200).send({ message: 'Access Granted' })
         }catch(err){
+            console.log(err)
             return res.status(500).send("Error interno");
         }
     }
+
     async getData(req, res){
         try{
             const [users, logs] = await fetchAll();
@@ -227,6 +264,25 @@ async function getUserByCard(Card_ID) {
             },
             ExpressionAttributeValues: {
                 ":Card_ID": Card_ID
+            }
+        });
+        const { Items } = await docClient.send(command);
+        return Items;
+    } catch (error) {
+        return 0;
+    }
+}
+
+async function getFilesByUser(username) {
+    try {
+        const command = new ScanCommand({
+            TableName: "Users",
+            FilterExpression: "#Username = :Username",
+            ExpressionAttributeNames: {
+                "#Username": "Username"
+            },
+            ExpressionAttributeValues: {
+                ":Username": username
             }
         });
         const { Items } = await docClient.send(command);

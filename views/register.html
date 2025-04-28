@@ -163,6 +163,68 @@
                     </div>
                 </div>
 
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"><b><br><i class="fas fa-camera mr-2"></i>Fotos de identificación</b></br></br></label>
+                    <div class="space-y-4">
+                        <!-- Foto de frente -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Foto de frente</label>
+                            <div class="flex items-center gap-4">
+                                <div class="relative flex-1">
+                                    <input id="frontPhoto" name="frontPhoto" type="file" accept="image/*" 
+                                        class="hidden" required onchange="previewImage(this, 'frontPreview')">
+                                    <button type="button" onclick="document.getElementById('frontPhoto').click()" 
+                                        class="w-full py-2 px-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg transition-colors">
+                                        <i class="fas fa-upload mr-2"></i> Seleccionar archivo
+                                    </button>
+                                </div>
+                                <div class="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                    <img id="frontPreview" class="absolute inset-0 object-cover w-full h-full hidden">
+                                    <i class="fas fa-user text-gray-400 text-xl" id="frontPlaceholder"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Foto lado izquierdo -->
+                        <div>
+                            <label  class="block text-sm text-gray-600 mb-1">Foto lado izquierdo</label>
+                            <div class="flex items-center gap-4">
+                                <div class="relative flex-1">
+                                    <input id="leftPhoto" name="leftPhoto" type="file" accept="image/*" 
+                                        class="hidden" required onchange="previewImage(this, 'leftPreview')">
+                                    <button type="button" onclick="document.getElementById('leftPhoto').click()" 
+                                        class="w-full py-2 px-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg transition-colors">
+                                        <i class="fas fa-upload mr-2"></i> Seleccionar archivo
+                                    </button>
+                                </div>
+                                <div class="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                    <img id="leftPreview" class="absolute inset-0 object-cover w-full h-full hidden">
+                                    <i class="fas fa-user text-gray-400 text-xl" id="leftPlaceholder"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Foto lado derecho -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Foto lado derecho</label>
+                            <div class="flex items-center gap-4">
+                                <div class="relative flex-1">
+                                    <input id="rightPhoto" name="rightPhoto" type="file" accept="image/*" 
+                                        class="hidden" required onchange="previewImage(this, 'rightPreview')">
+                                    <button type="button" onclick="document.getElementById('rightPhoto').click()" 
+                                        class="w-full py-2 px-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg transition-colors">
+                                        <i class="fas fa-upload mr-2"></i> Seleccionar archivo
+                                    </button>
+                                </div>
+                                <div class="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                    <img id="rightPreview" class="absolute inset-0 object-cover w-full h-full hidden">
+                                    <i class="fas fa-user text-gray-400 text-xl" id="rightPlaceholder"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Términos y Condiciones -->
                 <div class="flex items-start">
                     <div class="flex items-center h-5">
@@ -287,16 +349,37 @@
                 alert('Debes aceptar los términos y condiciones');
             }
             if (isValid) {
+                // Obtener los elementos del formulario
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const role = document.getElementById('role').value;
+                const card_id = document.getElementById('card_id').value;
+                const frontPhoto = document.getElementById('frontPhoto').files[0];
+                const leftPhoto = document.getElementById('leftPhoto').files[0];
+                const rightPhoto = document.getElementById('rightPhoto').files[0];
+
+                // Validar que todas las imágenes estén presentes
+                if (!frontPhoto || !leftPhoto || !rightPhoto) {
+                    alert('Por favor, sube todas las imágenes requeridas');
+                    return;
+                }
+
+                // Crear objeto FormData
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('password', password);
+                formData.append('role', role);
+                formData.append('card_id', card_id);
+                formData.append('frontPhoto', frontPhoto);
+                formData.append('leftPhoto', leftPhoto);
+                formData.append('rightPhoto', rightPhoto);
+
                 $.ajax({
                     type: "POST",
                     url: "/api/register/user",
-                    data: JSON.stringify({
-                        username: document.getElementById('username').value,
-                        password: document.getElementById('password').value,
-                        role: document.getElementById('role').value,
-                        card_id: document.getElementById('card_id').value
-                    }),
-                    contentType: 'application/json',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function(datos){
                         Swal.fire({
                             toast: true,
@@ -321,6 +404,35 @@
                 })
             }
          });
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(previewId.replace('Preview', 'Placeholder'));
+            const file = input.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+    // Opcional: Permitir hacer clic en la vista previa para seleccionar otra imagen
+    document.querySelectorAll('[id$="Preview"]').forEach(preview => {
+        const inputId = preview.id.replace('Preview', 'Photo');
+        preview.addEventListener('click', () => {
+            document.getElementById(inputId).click();
+        });
+    });
     </script>
 </body>
 </html>

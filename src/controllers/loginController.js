@@ -53,15 +53,20 @@ class loginController {
     }
     async registrarusuario(req,res){
         try{
+            console.log(req.uploadedFiles);
             if (req.user.userType === "Viewer"){
                 return res.status(401).send({ message: 'No Tienes Permiso de hacer esto' });
             }
             const roles = ["Administrator", "Viewer"]
+
             if (!roles.includes(req.body.role)){
                 return res.status(400).send({ message: 'El rol no existe' }); 
             }
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            req.body["frontPhoto"]=req.uploadedFiles.frontPhoto;
+            req.body["leftPhoto"]=req.uploadedFiles.leftPhoto;
+            req.body["rightPhoto"]=req.uploadedFiles.rightPhoto;
             req.body.password = hashedPassword;
             var user = await getUserByName(req.body.username);
             if (user.length >= 1){
@@ -71,6 +76,7 @@ class loginController {
             if (result.$metadata.httpStatusCode != 200){
                 return res.status(500).send({ message: 'Error inesperado' });
             }
+
             return res.status(200).send({ message: 'Usuario creado exitosamente' });
         }catch(err){
             return res.status(500).send("Error interno");
@@ -79,7 +85,7 @@ class loginController {
 }
 
 async function createUser(data){
-    const {username, password, role, card_id} = data
+    const {username, password, role, card_id, frontPhoto, leftPhoto, rightPhoto} = data
     const command = new PutCommand({
         TableName: "Users",
         Item: {
@@ -88,7 +94,10 @@ async function createUser(data){
             Username: username,
             Password: password,
             Role: role,
-            Card_ID: card_id
+            Card_ID: card_id,
+            frontPhoto: frontPhoto,
+            leftPhoto: leftPhoto,
+            rightPhoto: rightPhoto
         }
     });
     const response = await docClient.send(command);
