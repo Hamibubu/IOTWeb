@@ -21,7 +21,7 @@ const docClient = DynamoDBDocumentClient.from(client);
 class MetadataController {
     async validateCard(req, res){
         try{
-            if (req.headers["x-api-key"] !== "DejameEntrarPorfavorsitoPorfavorTeLoRuego"){
+            if (req.headers["x-api-key"] !== process.env.API_KEY){
                 return res.status(401).send({ message: 'No intentes entrar si no conoces como!' });
             }
             const st = await getUserByCard(req.body.Card_ID)
@@ -50,7 +50,7 @@ class MetadataController {
             const frontphoto = userdata.frontPhoto;
             const leftphoto = userdata.leftPhoto;
             const rightphoto = userdata.rightPhoto;
-            if (req.headers["x-api-key"] !== "DejameEntrarPorfavorsitoPorfavorTeLoRuego"){
+            if (req.headers["x-api-key"] !== process.env.API_KEY){
                 return res.status(401).send({ message: 'No intentes entrar si no conoces como!' });
             }
             const flask_server=process.env.FLASK_SERVER + "/recognize";
